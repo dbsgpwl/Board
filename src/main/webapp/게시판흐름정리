@@ -1,0 +1,83 @@
+* FrontController : 모든 url 요청을 받음(*.do url을 받음)
+* url주소 확인하는 이유: 해당 url에 대응하는 subcontroller를 꺼내 실행하기 위해 (subcontoller를 찾기 위한 Key값)
+
+
+*.do url 요청 -> Front에서 모든 url 요청 받음 (url+서브 객체주소 저장) 
+-> Url 정보와 서브 컨트롤러 객체를 저장하는 컬렉션(HashMap)생성
+
+-> 1. init ()에 저장 및 셋업
+	 : Sub 객체 주소가 list에 저장 - MemberJoin.do(url), new MemberJoinController() 저장
+ 
+-> 2. service () URL 주소 확인 후 SubController의 execute 실행
+	: req.getRequestURL() -> 각 SubController url주소 확인 
+	: list.get(url) -> SubController의 execute 로직 실행
+	
+==========================================================================
+
+-----------------
+회원가입(Join.jsp)
+-----------------
+0. FrontCotroller 모든 *.do 를 수신 web.xml 설정 완료(서버 재부팅)
+	<!-- FrontController URL Mapping -->
+    <servlet>
+      <servlet-name>FC</servlet-name>
+      <servlet-class>com.korea.controller.FrontController</servlet-class>
+   </servlet>
+   <servlet-mapping>
+      <servlet-name>FC</servlet-name>
+      <url-pattern>*.do</url-pattern>
+   </servlet-mapping>
+
+1. 외부 URL Request 요청 (사용자 요청)
+2. FrontController의 init() 초기화
+2. FrontController의 Service 함수 URl 확인 및 가져오기
+3. URL에 해당하는 SubController 객체 주소(Map) 확인 및 꺼내기
+4. SubController의 execute를 실행
+	1) 파라미터 받기(req, resp)
+	2)  입력값 검증(JS대체 가능)
+	3) 서비스 실행
+ 	service -> dao -> dto -> DB처리 
+	4) View로 이동(기본 최상위Path)
+		포워드/리다이렉트
+
+============================================================================
+
+-----------------
+로그인/로그아웃(Login.do, Logout.do)
+-----------------
+1 FrontCotroller에서 "/Login.do" , "/LoginController"를 init 호출 시 저장
+2 LoginController
+ 	1) 파라미터
+	2) 입력값 확인
+	3) 서비스 실행
+		MemberSerivce -> dao.select(email)
+	4) 패스워드 일치확인
+		-세션 객체에 grade 저장
+		-세션 객체에 email 저장
+	5) View로 이동
+		main.jsp로 redirect
+		
+		
+============================================================================
+
+-----------------
+회원 정보 수정
+-----------------
+1 FrontController "/MemberUpdate.do",MemberUpdateController 추가
+2 MemberUpdateController 
+	flag==null
+		/WEB-INF/member/password.jsp
+	flag!=null
+		1 파라미터 받기(수정예정인 회원정보)
+		2 패스워드 체크
+		3 패스워드가 일치하면 dto 수정 내용담는다
+		4 service.MemberUpdate(dto) -> dao.update ->DB 수정
+		5 req.setAttribute("dto",dto)
+		6 /WEB-INF/member/myinfo.jsp
+		
+
+-----------------
+필터 추가
+-----------------
+[참고]
+https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=adamdoha&logNo=221665607853

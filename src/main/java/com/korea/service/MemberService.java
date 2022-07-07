@@ -32,8 +32,13 @@ public class MemberService {
 		return dao.insert(dto);
 	}
 	
-	//memberDTO에 저장된 member 계정 정보 Select
+	//나의 정보 조회하기 
 	public MemberDTO MemberSearch(String email) {
 		return dao.Select(email);
+	}
+	
+	//나의 정보 수정하기 
+	public boolean MemberUpdate(MemberDTO dto) {
+		return dao.Update(dto);
 	}
 }

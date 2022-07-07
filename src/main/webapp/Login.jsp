@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>로그인</title>
 
 <%@include file="resources/includes/link.jsp" %>
 <link rel="stylesheet" href="resources/css/common.css">
