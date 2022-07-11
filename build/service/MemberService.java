@@ -17,9 +17,10 @@ public class MemberService {
 			instance=new MemberService();
 		return instance;
 	}
-	private MemberService() {}
+	private MemberService() {
+		
+	}
 	
-
 	//Join 시 member 정보 insert
 	public boolean MemberInsert(MemberDTO dto) {
 		//패스워드 암호화

@@ -14,10 +14,6 @@ public class MemberUpdateController implements SubController {
 	public void execute(HttpServletRequest req, HttpServletResponse resp) {
 		MemberService service = MemberService.getInstance();
 		
-		
-		
-		
-		
 		//파라미터 받기
 		String flag = req.getParameter("flag");
 		

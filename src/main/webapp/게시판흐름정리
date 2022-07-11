@@ -81,3 +81,44 @@
 -----------------
 [참고]
 https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=adamdoha&logNo=221665607853
+
+============================================================================
+
+-----------------
+필터 설정하기
+-----------------
+
+1)  Web.xml 에 filter-url mapping 하기
+		
+		<!-- Filter URL Mapping -->
+	<filter>
+		<filter-name>authority</filter-name>
+		<filter-class>com.korea.filter.authfilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>authority</filter-name>
+		<url-pattern>*.do</url-pattern> //특정 페이지만 필터처리할 수도 있음 
+	</filter-mapping>
+		
+
+2) 패키지생성, 클래스생성
+	- com.korea.filter 패키지 생성
+	- com.korea.filter.authfilter 클래스 생성
+	- authfilter implements filter
+	- doFilter()를 강제 재정의 (ServletRequest req ---)
+	
+	- 요청 전 (Filter->Controller) : Filter에 있는 코드를 적용 시킨 뒤, Controller로 이동
+	- chain.doFilter(req,resp) //doFilter를 기준으로 리퀘스트 
+	- 요청 후 (Controller->Filter) : Controller 코드 적용 뒤, Filter로 다시 이동
+	
+-----------------
+페이지별 권한 부여
+-----------------
+
+0) URL 별로 Grade 저장
+ 	- init() -> Map에 URL과 Grade 저장
+ 		0 : 게스트 1 : 일반  2 : 관리자
+ 	
+1) 세션 usergrade 가져오기
+2) URL pagegrade 가져오기
+3) 권한 설정
