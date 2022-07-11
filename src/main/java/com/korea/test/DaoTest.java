@@ -1,10 +1,11 @@
 package com.korea.test;
 
+import java.util.List;
+
 import org.junit.Test;
 
-import com.korea.dao.MemberDAO;
-import com.korea.dto.MemberDTO;
-import com.korea.service.MemberService;
+import com.korea.dao.BoardDAO;
+import com.korea.dto.BoardDTO;
 //juit : server 비활성화 상태에서 특정 테스트 진행 
 public class DaoTest {
 
@@ -45,28 +46,45 @@ public class DaoTest {
 //		dao.Update(dto);
 //	}
 	
+//	@Test
+//	public void test4() {
+//		MemberDTO dto = new MemberDTO();
+//		dto.setEmail("admin@admin.com");
+//		dto.setPwd("1234");
+//		dto.setAddr1("");
+//		dto.setAddr2("");
+//		dto.setGrade(2);
+//		
+//		MemberService service=MemberService.getInstance();
+//		service.MemberInsert(dto); //관리자 계정 등록
+//
+//		
+//		dto.setEmail("guest@guest.com");
+//		dto.setPwd("1234");
+//		dto.setAddr1("");
+//		dto.setAddr2("");
+//		dto.setGrade(0);
+//		
+//		service.MemberInsert(dto); //게스트 계정 등록
+//		
+//	}
+	
 	@Test
-	public void test4() {
-		MemberDTO dto = new MemberDTO();
-		dto.setEmail("admin@admin.com");
-		dto.setPwd("1234");
-		dto.setAddr1("");
-		dto.setAddr2("");
-		dto.setGrade(2);
+	public void Test4()
+	{
+		System.out.println("2");
+		BoardDAO dao = BoardDAO.getInstance();
+		System.out.println("1");
+		List<BoardDTO> list =dao.Select(11, 20);
+		System.out.println(list.size());
 		
-		MemberService service=MemberService.getInstance();
-		service.MemberInsert(dto); //관리자 계정 등록
-
+		//list.forEach(dto -> System.out.println(dto));
+		for(int i=0;i<list.size();i++)
+		{
+			System.out.println(list.get(i));	
+		}
 		
-		dto.setEmail("guest@guest.com");
-		dto.setPwd("1234");
-		dto.setAddr1("");
-		dto.setAddr2("");
-		dto.setGrade(0);
-		
-		service.MemberInsert(dto); //게스트 계정 등록
 		
 	}
-	
 
 }

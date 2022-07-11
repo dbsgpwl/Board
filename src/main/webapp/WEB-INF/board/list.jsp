@@ -28,53 +28,46 @@
 			</div>
 			
 			<h1>자유 게시판</h1>
-			<!-- 현재 페이지/전체 페이지 -->
+			<!-- 현재페이지/전체페이지 -->
 			<table class="table">
 				<tr >
-					<td style="border:0px;">1/100 Page</td>
-					<td style="border:0px; text-align:right;">
-						<button class="btn btn-dark">처음으로</button>
-						<button class="btn btn-dark">글쓰기</button>
+					<td style=border:0px;>1/100 Page</td>
+					<td style=border:0px;text-align:right;>
+						<button class="btn btn-secondary">처음으로</button>
+						<button class="btn btn-secondary">글쓰기</button>
 					</td>
 				</tr>
 			</table>
 			
-			<table class="table" style="text-align:center;">
-			
+			<table class="table">
 				<tr>
-					<th style="width:100px;">No</th>
-					<th>Title</th>
-					<th>Writer</th>
-					<th>Date</th>
-					<th>Count</th>
+					<th> NO </th>
+					<th> TITLE </th>
+					<th> WRITER</th>
+					<th> Date</th>
+					<th> COUNT</th>
 				</tr>
-							
-				<!-- list 반복 처리 -->	
-				<%@page import="java.util.*, com.korea.dto.*" %>
+				
+				<%@page import="java.util.*,com.korea.dto.*" %>
 				<%
-					Arraylist<BoardDTO> list=(Arraylist<BoardDTO>)request.getAttribute("list");
-					for(int i=0; i<list.size(); i++){
-						%>
-						<tr>
-							<td><%=list.get(i).getNo() %></td>
-							<td><%=list.get(i).getTitle() %></td>
-							<td><%=list.get(i).getWriter() %></td>
-							<td><%=list.get(i).getRegdate() %></td>
-							<td><%=list.get(i).getCount() %></td>
-						</tr>
-					}
+					ArrayList<BoardDTO>list = (ArrayList<BoardDTO>)request.getAttribute("list");
+					for(int i=0;i<list.size();i++)
+					{
 				%>
 				<tr>
-					<td>1</td>
-					<td>글제목1</td>
-					<td>작성자1</td>
-					<td>2022-07-11</td>
-					<td>1</td>
+					<td><%=list.get(i).getNo() %></td>
+					<td><%=list.get(i).getTitle() %></td>
+					<td><%=list.get(i).getWriter() %></td>
+					<td><%=list.get(i).getRegdate() %></td>
+					<td><%=list.get(i).getCount() %></td>
 				</tr>
-			
+				<%
+					}
+				%>
+				
 				<tr>
 					<!-- 페이지네이션 -->
-					<td colspan=5 style="border-bottom:0px;">
+					<td colspan=5  style=border-bottom:0px;>
 						<nav aria-label="Page navigation example">
 						  <ul class="pagination">
 						    <li class="page-item">

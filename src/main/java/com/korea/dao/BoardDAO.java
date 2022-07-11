@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.korea.dto.BoardDTO;
 
 public class BoardDAO {
 	//DB 연결
@@ -36,30 +39,51 @@ public class BoardDAO {
 			}
 			
 			//
-			public List<BoardDAO> Select(int start, int end){
+			public List<BoardDTO> Select(int start, int end)
+			{
+				
+				ArrayList<BoardDTO> list = new ArrayList();
+				BoardDTO dto = null;
 				try {
-							String sql=
-				            "select rn, no, title, content, writer, regdate,pwd,count,ip,filename,filesize"
-				            + "from"
-				            + "("
-				            + "    select /*+ INDEX_DESC (tbl_board PK_NO) */"
-				            + "    rownum rn, no, title, content, writer, regdate,pwd,count,ip,filename,filesize"
-				            + "    from tbl_board where rownum <= 10\r\n"
-				            + ")"
-				            + "where rn>1;";
-							
-							pstmt = conn.prepareStatement(sql);
-							pstmt.setInt(1,end);
-							pstmt.setInt(2, start);
-							rs=pstmt.executeQuery();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}finally {
 					
+					String sql=
+							"select rn, no, title, content, writer, regdate,pwd,count,ip,filename,filesize"
+							+ " from"
+							+ "("
+							+ "    select /*+ INDEX_DESC (tbl_board PK_NO) */"
+							+ "    rownum rn, no, title, content, writer, regdate,pwd,count,ip,filename,filesize"
+							+ "    from tbl_board where rownum<=?"
+							+ ")"
+							+ " where rn>=?";
+					
+					pstmt = conn.prepareStatement(sql);
+					pstmt.setInt(1, end);
+					pstmt.setInt(2, start);
+					rs=pstmt.executeQuery();
+					
+					while(rs.next())
+					{
+						dto=new BoardDTO();
+						dto.setNo(rs.getInt("no"));
+						dto.setTitle(rs.getString("title"));
+						dto.setContent(rs.getString("content"));
+						dto.setWriter(rs.getString("writer"));
+						dto.setRegdate(rs.getString("regdate"));
+						dto.setPwd(rs.getString("pwd"));
+						dto.setIp(rs.getString("ip"));
+						dto.setFilename(rs.getString("filename"));
+						dto.setFilesize(rs.getString("filesize"));
+						dto.setCount(rs.getInt("count"));
+						list.add(dto);
+					}
+					
+				}catch(Exception e) {
+					e.printStackTrace();
+				}finally{
+					try {rs.close();}catch(Exception e) {e.printStackTrace();}
+					try {pstmt.close();}catch(Exception e) {e.printStackTrace();}
 				}
-				
-				return null;
-				
+				return list;
 			}
 
 }
