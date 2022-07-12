@@ -38,12 +38,12 @@ public class BoardDAO {
 				
 			}
 			
-			//
+			//시작페이지, 끝페이지번호 받아서 조회
 			public List<BoardDTO> Select(int start, int end)
 			{
 				
 				ArrayList<BoardDTO> list = new ArrayList();
-				BoardDTO dto = null;
+				BoardDTO dto = null; //참조변수
 				try {
 					
 					String sql=
@@ -57,8 +57,8 @@ public class BoardDAO {
 							+ " where rn>=?";
 					
 					pstmt = conn.prepareStatement(sql);
-					pstmt.setInt(1, end);
-					pstmt.setInt(2, start);
+					pstmt.setInt(1, end);//마지막 rownum
+					pstmt.setInt(2, start);//시작 rownum
 					rs=pstmt.executeQuery();
 					
 					while(rs.next())
@@ -80,12 +80,31 @@ public class BoardDAO {
 				}catch(Exception e) {
 					e.printStackTrace();
 				}finally{
-					try {rs.close();}catch(Exception e) {e.printStackTrace();}
+					try {rs.close();}catch(Exception e) {e.printStackTrace();}//자원제거
 					try {pstmt.close();}catch(Exception e) {e.printStackTrace();}
 				}
-				return list;
+				return list; //리턴 : Service
 			}
 
+			
+			//모든 게시물 개수 조회
+			public int getTotalCount() { //Count 로 게시물 개수 조회
+				int result=0;
+				try {
+					pstmt = conn.prepareStatement("select count(*) from tbl_board"); //500개
+					rs = pstmt.executeQuery();
+					rs.next(); 
+					result = rs.getInt(1); //전체 게시물 건수 받아오기
+				} catch (Exception e) {
+					e.printStackTrace();
+				}finally {
+					try {rs.close();}catch(Exception e) {e.printStackTrace();}//자원제거
+					try {pstmt.close();}catch(Exception e) {e.printStackTrace();}
+				}
+				return result;
+				
+			}
+			
 }
 
 

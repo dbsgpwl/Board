@@ -69,22 +69,29 @@ public class DaoTest {
 //		
 //	}
 	
+//	@Test
+//	public void Test4()
+//	{
+//		System.out.println("2");
+//		BoardDAO dao = BoardDAO.getInstance();
+//		System.out.println("1");
+//		List<BoardDTO> list =dao.Select(11, 20);
+//		System.out.println(list.size());
+//		
+//		//list.forEach(dto -> System.out.println(dto));
+//		for(int i=0;i<list.size();i++)
+//		{
+//			System.out.println(list.get(i));	
+//		}
+//		
+//		
+//	}
+	
 	@Test
-	public void Test4()
-	{
-		System.out.println("2");
+	public void test5() {
 		BoardDAO dao = BoardDAO.getInstance();
-		System.out.println("1");
-		List<BoardDTO> list =dao.Select(11, 20);
-		System.out.println(list.size());
-		
-		//list.forEach(dto -> System.out.println(dto));
-		for(int i=0;i<list.size();i++)
-		{
-			System.out.println(list.get(i));	
-		}
-		
-		
+		int result = dao.getTotalCount();
+		System.out.println("게시물 건수 : " + result);
 	}
 
 }

@@ -12,16 +12,23 @@ public class BoardService {
 	
 	//싱글톤 패턴
 	private static BoardService instance=null;
-	public static BoardService getInstance() {
+	public static BoardService getInstance() 
+	{
 		if(instance==null)
 			instance = new BoardService();
 		return instance;
 	}
 	private BoardService() {}
 	
+	//게시물 시작, 끝 번호 받아서 조회
 	public List<BoardDTO> getBoardList(int start,int end)
 	{
 		return dao.Select(start, end);
 	}
 	
+	//게시물 개수
+	public int getTotalCnt() 
+	{
+		return dao.getTotalCount();
+	}
 }
