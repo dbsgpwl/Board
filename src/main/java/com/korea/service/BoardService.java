@@ -31,4 +31,10 @@ public class BoardService {
 	{
 		return dao.getTotalCount();
 	}
+	
+	//게시물 입력(Insert)
+	public boolean PostBoard(BoardDTO dto)
+	{
+		return dao.Insert(dto);
+	}
 }

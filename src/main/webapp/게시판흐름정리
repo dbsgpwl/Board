@@ -124,4 +124,104 @@ https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=adamdoha&log
 3) 권한 설정
 
 ============================================================================
+ --------------------------
+1 db 
+--------------------------
+--DB생성
+drop table tbl_board;
+create table tbl_board
+(
+    no int primary key,
+    title varchar2(50) not null,
+    content varchar2(255) not null,
+    writer varchar2(100) not null,
+    regdate date,
+    pwd varchar(255) not null,
+    count int,
+    ip varchar(50),
+    filename varchar(100),
+    filesize varchar(100)
+);
+desc tbl_board;
+
+--500 Post
+
+DECLARE
+NUM1 NUMBER :=1;
+BEGIN
+    LOOP
+     
+     insert into tbl_board values
+     (NUM1,'Title'||NUM1,'Content'||NUM1,'Writer'||NUM1,sysdate,'1234',0,'127.0.0.1','0','0');
+     
+    NUM1 := NUM1+1; 
+    EXIT WHEN NUM1 >500; --NUM1이 10보다 크면 LOOP종료
+    END LOOP;
+END;
+
+select * from tbl_board;
+
+
+
+
+--------------------------
+2 게시물받기
+--------------------------
+1) 게시물 받기 기본- select(int start,int end)
+SQL문
+select rn, no, title, content, writer, regdate,pwd,count,ip,filename,filesize
+from
+(
+    select /*+ INDEX_DESC (tbl_board PK_NO) */
+    rownum rn, no, title, content, writer, regdate,pwd,count,ip,filename,filesize
+    from tbl_board where rownum<=10
+)
+where rn>=1 
  
+============================================================================
+
+--------------------------
+3 총 페이지 수 받기
+--------------------------
+DAO - select count(*) from tbl_board;
+Service
+Controller (req.setAttribute())
+view
+
+list.jsp
+-전체게시물건수 받기
+-전체페이지 계산
+
+--------------------------
+4 페이지네이션 
+--------------------------
+-표시할 페이지 블럭 수
+-전체 블럭 수 (전체 페이지 수)
+
+
+-블럭내 페이지 이동 
+1) 페이지번호 클릭 -> paging(페이지번호) 호출
+2) paging함수 받은페이지번호를 이용해서 start,end 계산
+3) form(readFrm)에 start,end,nowPage를 저장
+4) 폼전송(/Board/list.do)
+5) BoardListController 
+	-파라미터 확인(start,end,pageNum)
+	-서비스(start,end)
+	-start,end에 의해 검색된 게시물들을 list.jsp 전달 
+
+
+-블럭간 이동
+1) 이전/이후 버튼 클릭
+2) block(이전or이후 블럭번호) 함수 호출
+   - 이동될 블럭에서 표시할 페이지 번호 구하기, readFrm폼에 저장 
+   - start값 readFrm폼에 저장 
+   - end 값 readFrm폼에 저장 
+   - nowPage값 readFrm폼에 저장 
+3) 폼전송(/Board/list.do)
+4) BoardListController 
+	-파라미터 확인(start,end,pageNum)
+	-서비스(start,end)
+	-start,end에 의해 검색된 게시물들을 list.jsp 전달 
+	
+============================================================================
+
