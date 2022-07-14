@@ -214,7 +214,7 @@
 				</tr>
 			</table>
 			
-			<a href="/Board/post.do">글쓰기</a>
+			<a href="/Board/post.do">글쓰기</a> <!-- flag 미포함 -->
 		</div>
 		<!-- Footer -->
 	</div>
