@@ -2,7 +2,7 @@ package com.korea.updownTest;
 
 import java.io.*;
 
-public class C01FileClass {
+public class C00FileClass {
 
 	public static void main(String[] args) {
 		File tmp = new File("c://upload");

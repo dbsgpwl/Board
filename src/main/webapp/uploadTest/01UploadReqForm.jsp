@@ -15,7 +15,7 @@
 	multipart/form-data 옵션을 적용한다
  -->
 	<form method="post" action="/upload1" enctype="multipart/form-data">
-		Upload's file : <input type="file" name="test">
+		Upload's file : <input type="file" name="test" multiple />
 		<input type="submit" value="upload">
 		
 	</form>
