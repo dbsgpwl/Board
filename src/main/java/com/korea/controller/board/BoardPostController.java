@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import com.korea.controller.SubController;
 import com.korea.dto.BoardDTO;
@@ -51,8 +52,15 @@ public class BoardPostController implements SubController {
 				dto.setPwd(pwd);
 				dto.setIp(ip);
 				dto.setWriter(writer);
-				boolean result = service.PostBoard(dto);
 				
+				//추가 파일 part 전달(Upload)
+				
+				ArrayList<Part> parts=(ArrayList<Part>)req.getParts();
+				boolean result=false;
+				if(parts==null)	//파일전달이 안된 경우
+					result = service.PostBoard(dto);
+				else 			//파일이 포함되어 있는 경우
+					result = service.PostBoard(dto,parts);
 				// 4 뷰 이동
 				if(result)
 				{

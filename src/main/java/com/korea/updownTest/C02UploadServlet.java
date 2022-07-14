@@ -1,6 +1,7 @@
 package com.korea.updownTest;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -10,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-@WebServlet("/upload1")
+@WebServlet("/upload2")
 @MultipartConfig //멀티파트 리퀘스트 기본 설정
 (
 		fileSizeThreshold=1024*1024*10,  //10Mb
@@ -35,6 +36,9 @@ public class C02UploadServlet extends HttpServlet {
 			System.out.println("FILENAME : "+getFileName(part));
 			System.out.println("---------------------");
 		}
+		
+		String id = UUID.randomUUID().toString();
+		System.out.println("ID : "+id);
 	}
 	
 	//DAO 저장용 함수 생성
