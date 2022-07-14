@@ -21,7 +21,6 @@ import com.korea.controller.notice.NoticeListController;
 import com.korea.controller.notice.NoticePostController;
 
 
-//@WebServlet
 @MultipartConfig
 (
       fileSizeThreshold = 1024*1024*10,    //10Mb
