@@ -106,6 +106,17 @@
 					form.submit();
 				}
 				
+				/* 게시물 읽기 */
+				function read(no) //no : 게시물 번호
+				{
+					form=document.readFrm;
+					form.no.value=no;
+					form.nowPage.value=<%=nowPage%>; 
+					form.action="/Board/read.do"; //frontController에 (/Board/read.do, BoardReadController) map 추가
+					form.submit();
+					
+				}
+				
 				</script>
 				<!-- 처음으로 이동 처리 폼 -->
 					<form name="initFrm" method="get">
@@ -150,7 +161,7 @@
 				%>
 				<tr>
 					<td><%=list.get(i).getNo() %></td>
-					<td><%=list.get(i).getTitle() %></td>
+					<td><a href="javascript:read('<%=list.get(i).getNo() %>')"><%=list.get(i).getTitle() %></a></td> <!-- 타이틀에 링크를 삽입하여 클릭시 해당 게시물로 이동! -->
 					<td><%=list.get(i).getWriter() %></td>
 					<td><%=list.get(i).getRegdate() %></td>
 					<td><%=list.get(i).getCount() %></td>

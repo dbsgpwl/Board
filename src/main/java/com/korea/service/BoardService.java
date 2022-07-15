@@ -122,5 +122,10 @@ public class BoardService {
       String Filename = arr[2].substring(11, (arr[2].length()-1));
       return Filename;
    }
+   
+   //게시물 하나 가져오기
+   public BoardDTO getBoardDTO(int no) {
+	   return dao.Select(no);
+   }
 }
 

@@ -56,11 +56,13 @@ public class BoardPostController implements SubController {
 					dto.setWriter(writer);
 				
 				//추가 파일 part 전달(Upload)
-				
+			
+					
 				ArrayList<Part> parts=(ArrayList<Part>)req.getParts(); //req.getParts(): -request로부터 part를 꺼내옴
 				
 				boolean result=false;
-				if(parts==null)	{//파일전달이 안된 경우(파일 미포함 글쓰기 요청)
+				long size = parts.get(3).getSize(); //파일 사이즈가 없는경우 -> 파일이 없음!
+				if(size==0)	{//파일전달이 안된 경우(파일 미포함 글쓰기 요청)
 					System.out.println("1");
 					result = service.PostBoard(dto);
 				}
