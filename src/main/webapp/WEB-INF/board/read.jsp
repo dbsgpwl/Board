@@ -44,8 +44,7 @@
          <input name = "title" class = "form-control mb-3 w-50" value="<%=dto.getTitle() %>"/ >
          <input name="writer" class="form-control mb-3 w-50" value="<%=dto.getWriter() %>"/>
         
-         <textarea name = "content"  class = "form-control mb-3 w-50" style= "height:500px;">
-         	<%=dto.getContent() %>
+         <textarea name = "content"  class = "form-control mb-3 w-50" style= "height:500px;"><%=dto.getContent() %>
          </textarea>
        
          
@@ -70,12 +69,23 @@
 			      </div>
 			      <div class="modal-body">
 			      <!-- 첨부파일 -->
+			      <%@page import="java.net.URLEncoder" %>
 			        <%
 			        	if(filelist!=null){//파일이름이 있다면 
 			        		
 			         		for (int i=0; i<filelist.length;i++){
-			         			out.println("<a href=#>"+filelist[i]+"("+filesize[i]+"byte)</a><br>");
-				        	}
+			         			
+			         			String tmpfilename = filelist[i].substring(0,filelist[i].lastIndexOf("_"));
+			         			tmpfilename += filelist[i].substring(filelist[i].lastIndexOf("."),filelist[i].length());
+			         			
+			         			filelist[i] = URLEncoder.encode(filelist[i], "utf-8").replaceAll("\\+", "%20");
+			         			
+			         			
+			         			out.println("<a href=/Board/download.do?filename="+filelist[i]+">"+tmpfilename+"("+filesize[i]+"byte)</a><br>");
+				        
+			         		}
+			        	
+			        	
 			        		
 			        		}else{
 			        			out.println("파일 없음");
@@ -85,8 +95,8 @@
          			
 			      </div>
 			      <div class="modal-footer">
+			        <a  class="btn btn-dark" href="/Board/download.do?flag=all">모두 받기</a>
 			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-			        <button type="button" class="btn btn-dark">모두 받기</button>
 			      </div>
 			    </div>
 			  </div>

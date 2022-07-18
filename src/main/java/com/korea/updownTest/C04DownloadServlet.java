@@ -29,8 +29,8 @@ public class C04DownloadServlet extends HttpServlet{
 		resp.setContentType("application/octet-stream"); //Content-Type 를 application/octet-stream 로 설정
 		
 		//3 문자셋 설정
-		filename=URLEncoder.encode(filename,"utf-8").replaceAll("\\+", "%20");
-		resp.setHeader("Content-Disposition", "attachment; fileName="+filename); //fileName="+filename : 다운로드시 적용할 파일 이름
+		filename=URLEncoder.encode(filename,"utf-8").replaceAll("\\+", "%20");//파일이름 유니코드 문자셋 그안에 공백을 원래로 돌림
+		resp.setHeader("Content-Disposition", "attachment; fileName="+filename); // 업로드 했던 파일명과 동일하게 다운로드 가능해짐 //fileName="+filename : 다운로드시 적용할 파일 이름
 		
 		//4 스트림 설정(다운로드 코드)
 		byte[] buffer = new byte[4096]; //4byte안의 데이터를 받아서 브라우저에 표시함 //버퍼공간(파일로부터 서블릿으로 받아올 단위공간
@@ -38,7 +38,7 @@ public class C04DownloadServlet extends HttpServlet{
 		ServletOutputStream sout = resp.getOutputStream();		//출력 스트림(서블릿(서버) -> 브라우저)
 		
 		int read;		//read 시 더이상 받을게 있나없나 확인용 //바이트수가 read에 저장됨
-		while(true) {
+		while(true) {	//반복되는 동안 파일에서 서블릿으로 가는 경로를 계속 읽어 들임
 			read = fin.read(buffer,0,buffer.length);	//파일->서블릿으로 buffer공간의
 														//0 idx부터 buffer의 길이(buffer.length)만큼 담기
 														//read에는 읽어들인 byte수가 저장된다
@@ -55,5 +55,7 @@ public class C04DownloadServlet extends HttpServlet{
 		sout.flush();									//브라우저 방향으로 데이터 전송에 사용된 버퍼 공간 초기화
 		sout.close();									//출력 스트림 종료
 		fin.close();									//입력 스트림 종료
+		
+		//5 뷰로 이동 (생략) -> 다운로드를 고정된 위치에서 해야하기 때문
 	}
 }

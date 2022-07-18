@@ -1,13 +1,20 @@
 package com.korea.service;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
+
 import com.korea.dao.BoardDAO;
 import com.korea.dto.BoardDTO;
 public class BoardService {
@@ -79,20 +86,24 @@ public class BoardService {
             
            
             
+            
+            try {
+            	
+            
+            int start=FileName.lastIndexOf(".");;		//끝에서부터 . 에 대한 idx 번호 찾기
+            int end=FileName.length();;					
+            String ext = FileName.substring(start,end);	//파일명 잘라내기(확장자만)
+            FileName=FileName.substring(0,start);		//파일명 잘라내기(확장자 제외)
+            
+            //파일명 + _UUID + 확장자
+            FileName=FileName+"_"+UUID.randomUUID().toString()+ext; //파일이름 중복방지
+            
+            
+
             //DTO 저장을 위한 파일명 buffer에 추가
             totalFilename.append(FileName+ ";");
             //DTO 저장을 위한 파일사이즈 buffer에 추가
             totalFilesize.append(String.valueOf(part.getSize()+ ";"));
-            
-            try {
-
-            int start=FileName.length()-4;		//확장자 구하기 위한 시작 idx
-            int end=FileName.length();			//확장자 구하기 위한 끝 idx
-            String ext = FileName.substring(start,end);	//파일명 잘라내기(확장자만)
-            FileName=FileName.substring(0,start-1);		//파일명 잘라내기(확장자 제외)
-            
-            //파일명 + _UUID + 확장자
-            FileName=FileName+"_"+UUID.randomUUID().toString()+ext; //파일이름 중복방지
             
            
             //파일 업로드
@@ -126,6 +137,140 @@ public class BoardService {
    //게시물 하나 가져오기
    public BoardDTO getBoardDTO(int no) {
 	   return dao.Select(no);
+   }
+   
+   //단일파일 다운로드
+
+   public boolean download(String filename, HttpServletRequest req, HttpServletResponse resp) {
+	   						//매개변수 지정
+       //파일명
+
+       //파일명, 등록날짜
+
+       //이메일계정
+       HttpSession session = req.getSession(); 	//읽고있는 게시물을 session 에서 꺼내기(BoardreadController에서 저장한)
+       BoardDTO dto = (BoardDTO) session.getAttribute("dto");
+
+       String email = dto.getWriter();			//dto에서 이메일과 날짜정보 받기
+       String regdate = dto.getRegdate();
+       regdate = regdate.substring(0, 10);
+
+       System.out.println("REGDate : " + regdate);
+
+       //1 경로설정
+       String downdir = "c://upload";
+       String filepath = downdir + "/" + email + "/" + regdate + "/" + filename; //filename 외부에서 전달받음 
+
+       //2 헤더설정 	//다운로드용으로 만들기 위한 작업
+       resp.setContentType("application/octet-stream");
+
+       //3 문자셋 설정
+       try {
+           //filename = URLEncoder.encode(filename, "utf-8").replaceAll("\\+", "%20"); //파일이름 인코딩
+
+           resp.setHeader("Content-Disposition", "attachment; fileName=" + filename); //헤더에 파일이름 전달
+
+           //04스트림형성(다운로드 처리)
+           FileInputStream fin = new FileInputStream(filepath);	
+           ServletOutputStream bout = resp.getOutputStream();	//getOutputStream() 브라우저 방향으로 전달할 내용을 bout 에 저장
+
+           int read = 0;
+           byte buff[] = new byte[4096];
+           while(true){
+               read = fin.read(buff,0,buff.length);	//buffer공간에 0번째부터 buffer길이까지 받기 
+               if(read == -1)
+                   break;
+               bout.write(buff,0,read);			//브라우저 방향으로 buffer에 저장된 내용 전달
+
+           }
+           bout.flush();
+           bout.close();
+           fin.close();
+           
+           return true;
+
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+
+       //등록날짜
+
+       //c:\\upload\\이메일명\\등록날짜\\파일들.
+
+       return false;
+   }
+   
+   
+   //전체파일 다운로드
+
+   public boolean download(HttpServletRequest req, HttpServletResponse resp) {
+	   						//매개변수 지정
+       //파일명
+
+       //파일명, 등록날짜
+
+       //이메일계정
+       HttpSession session = req.getSession(); 	//읽고있는 게시물을 session 에서 꺼내기(BoardreadController에서 저장한)
+       BoardDTO dto = (BoardDTO) session.getAttribute("dto");
+
+       String email = dto.getWriter();			//dto에서 이메일과 날짜정보 받기
+       String regdate = dto.getRegdate();
+       regdate = regdate.substring(0, 10);
+
+       System.out.println("REGDate : " + regdate);
+
+       //1 경로설정
+       String downdir = "c://upload";
+       String filepath = downdir + "/" + email + "/" + regdate; //filename 외부에서 전달받음 
+
+       //2 헤더설정 	//다운로드용으로 만들기 위한 작업
+       resp.setContentType("application/octet-stream");
+
+       
+       
+       //3 파일 검색 
+       File dir = new File(filepath);
+       File[] flist = dir.listFiles();	//폴더 안에 있는 파일 모두 꺼내기
+      
+       //3 문자셋 설정
+       try {
+    	   
+    	   for(int i =0; i<flist.length;i++) {
+    		   String filename=flist[i].getName();	//지역변수
+    		   
+    		   filename = URLEncoder.encode(filename, "utf-8").replaceAll("\\+", "%20"); //파일이름 인코딩
+    		   resp.setHeader("Content-Disposition", "attachment; fileName=" ); //헤더에 파일이름 전달
+    	   }
+    	   
+
+           //04스트림형성(다운로드 처리)
+           FileInputStream fin = new FileInputStream(flist[i]);	
+           ServletOutputStream bout = resp.getOutputStream();	//getOutputStream() 브라우저 방향으로 전달할 내용을 bout 에 저장
+
+           int read = 0;
+           byte buff[] = new byte[4096];
+           while(true){
+               read = fin.read(buff,0,buff.length);	//buffer공간에 0번째부터 buffer길이까지 받기 
+               if(read == -1)
+                   break;
+               bout.write(buff,0,read);			//브라우저 방향으로 buffer에 저장된 내용 전달
+
+           }
+           bout.flush();
+           bout.close();
+           fin.close();
+           
+           return true;
+
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+
+       //등록날짜
+
+       //c:\\upload\\이메일명\\등록날짜\\파일들.
+
+       return false;
    }
 }
 
