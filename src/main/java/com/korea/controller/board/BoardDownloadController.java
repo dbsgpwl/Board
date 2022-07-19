@@ -21,7 +21,7 @@ public class BoardDownloadController implements SubController {
 
         //서비스
         boolean result= false;
-        	result = service.download(filename, req, resp);
+        result = service.download(filename, req, resp);
         
 
         //View

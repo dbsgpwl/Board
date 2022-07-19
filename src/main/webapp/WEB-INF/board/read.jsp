@@ -39,6 +39,15 @@
       		filelist = dto.getFilename().split(";");
       		filesize = dto.getFilesize().split(";");
       	}
+      	
+      	//시작번호 계산
+		int np = Integer.parseInt(nowPage);
+		int numPerPage=10;
+		int start=(np*numPerPage)-numPerPage+1;
+		
+		//끝번호 계산 
+		int end=np*numPerPage;
+		
       %>
       <form action="#" method ="post">
          <input name = "title" class = "form-control mb-3 w-50" value="<%=dto.getTitle() %>"/ >
@@ -105,7 +114,9 @@
 			      <!-- 다중파일 무압축 받기 -->
 			      <form name="multiform">
 			      	<%
+			      	
 			      		for(int i=0; i<filelist.length; i++){
+			      			
 			      	%>
 			      			<input type="hidden" name="file" value=<%=filelist[i] %> /> <%-- <%=filelist[i] %> :인코딩 된 파일 리스트 이름들 --%>
 			      	<%		
@@ -115,10 +126,12 @@
 			      
 			 <script>
 				    $(document).ready(function () {
+				    	
 				        form = document.multiform;
 				        var iFrameCnt = 0;			//프레임 개수 확인, 프레임 이름 지정
 				
 				        $('#downall').click(function (event){				//다운로드 이미지 실행
+				        	
 				            for (i = 0; i < form.childElementCount; i++) {	//form 하위에 있는 자식태그의 개수만큼 반복
 				
 				                fileName = form[i].value;

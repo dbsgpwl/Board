@@ -285,9 +285,9 @@ public class BoardService {
  	//ZIP 으로 압축 다운로드
 	public boolean downloadZIP(BoardDTO dto, HttpServletResponse resp) {
 		
-		
+		String id = UUID.randomUUID().toString();
 		//압축파일경로
-		String zipFileName="C://Users/dbsgp/Downloads/ALL.zip";
+		String zipFileName="C://Users/dbsgp/Downloads/ALL_"+id+".zip";
 		
 		//파일명,	//등록날짜 //이메일계정 가져오기
  		String email = dto.getWriter();
@@ -307,10 +307,9 @@ public class BoardService {
  		
  		
  		//3 헤더 설정
- 		resp.setContentType("application/ontet-stream");
-		resp.setHeader("Content-Disposition", "attachment; fileName=ALL.zip");
+ 		resp.setContentType("application/zip");
+		resp.setHeader("Content-Disposition", "attachment; fileName=ALL_"+id+".zip");
 		
- 		//4 문자셋 설정
  		try {
  			
  			//프로그램 -> 파일 방향 ZIPStream 생성
@@ -349,6 +348,10 @@ public class BoardService {
 		e.printStackTrace();
 	}
  		return false;
+	}
+	
+	public void CountUp(int no) {
+		dao.CountUp(no);
 	}
 }
 

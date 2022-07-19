@@ -41,7 +41,6 @@ public class BoardListController implements SubController{
 			//서비스실행
 			
 			List<BoardDTO> list = service.getBoardList(start, end); //게시물 시작, 끝번호 조회
-			
 			int tcnt = service.getTotalCount(); //게시물 총건수 조회
 			
 			req.setAttribute("list", list);

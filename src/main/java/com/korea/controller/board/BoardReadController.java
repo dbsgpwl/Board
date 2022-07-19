@@ -31,9 +31,13 @@ public class BoardReadController implements SubController {
 		session.setAttribute("dto",dto);
 		//뷰로 이동
 		try {
+			
+			
 			req.setAttribute("dto", dto);
 			req.setAttribute("nowPage", nowPage); //수정후 다시 읽고 있던 페이지 위치로 돌아오기
 			req.getRequestDispatcher("/WEB-INF/board/read.jsp").forward(req, resp);
+			
+			
 		} catch (ServletException e) {
 			e.printStackTrace();
 		} catch(IOException e) {
