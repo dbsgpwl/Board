@@ -78,7 +78,7 @@
 			         			String tmpfilename = filelist[i].substring(0,filelist[i].lastIndexOf("_"));
 			         			tmpfilename += filelist[i].substring(filelist[i].lastIndexOf("."),filelist[i].length());
 			         			
-			         			filelist[i] = URLEncoder.encode(filelist[i], "utf-8").replaceAll("\\+", "%20");
+			         			filelist[i] = URLEncoder.encode(filelist[i], "utf-8").replaceAll("\\+", "%20"); //인코딩된 파일이름
 			         			
 			         			
 			         			out.println("<a href=/Board/download.do?filename="+filelist[i]+">"+tmpfilename+"("+filesize[i]+"byte)</a><br>");
@@ -94,20 +94,58 @@
          			%>
          			
 			      </div>
-			      <div class="modal-footer">
-			        <a  class="btn btn-dark" href="/Board/download.do?flag=all">모두 받기</a>
+				      <div class="modal-footer">
+				      
+				        <a  id="downall" class="btn btn-dark" href="#"> 모두 받기(NoZIP)</a>
+				        <a class="btn btn-dark" href="/Board/downloadAll.do">모두받기(ZIP)</a>
+			        
 			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
 			      </div>
+			      
+			      <!-- 다중파일 무압축 받기 -->
+			      <form name="multiform">
+			      	<%
+			      		for(int i=0; i<filelist.length; i++){
+			      	%>
+			      			<input type="hidden" name="file" value=<%=filelist[i] %> /> <%-- <%=filelist[i] %> :인코딩 된 파일 리스트 이름들 --%>
+			      	<%		
+			      		}
+			      	%>
+			      </form>
+			      
+			 <script>
+				    $(document).ready(function () {
+				        form = document.multiform;
+				        var iFrameCnt = 0;			//프레임 개수 확인, 프레임 이름 지정
+				
+				        $('#downall').click(function (event){				//다운로드 이미지 실행
+				            for (i = 0; i < form.childElementCount; i++) {	//form 하위에 있는 자식태그의 개수만큼 반복
+				
+				                fileName = form[i].value;
+				                var url = "/Board/download.do?filename=" + fileName;		//전달할 url 경로 넣어주기
+				                fnCreateIframe(iFrameCnt);	//보이지 않는 iframe 생성, name 은 숫자로
+				                $("iframe[name=" + iFrameCnt + "]").attr("src", url);
+				                iFrameCnt++;
+				                fnSleep(1000);		//1초
+				            }
+				        });
+				        fnCreateIframe = function (name){
+				
+				            var frm = $('<iframe name = "' + name + '" style = " display: none;"></iframe>');
+				            frm.appendTo("body");
+				        }
+				        fnSleep = function (delay) {
+				            var start = new Date().getTime();
+				            while (start + delay > new Date().getTime());	//언제까지 반복할 것인지! 현재시간보다 Start+delay가 크다면 반복
+				        };
+				    });
+				</script>
+			      
 			    </div>
 			  </div>
 			</div>
 			
-         	
-      
-      
-       
         
-      <!-- Footer -->
    </div>
 </body>
 </html>

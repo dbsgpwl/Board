@@ -2,12 +2,15 @@ package com.korea.service;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -57,7 +60,11 @@ public class BoardService {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
       String date = simpleDateFormat.format(now);
       
-      String subPath = email + "/" + date;
+      
+      //게시물 번호
+      String no = String.valueOf(dao.getLastNo()+1);
+      
+      String subPath = email + "/" + date +no;
       
       //file클래스 경로 연결하기
       File RealPath = new File(UploadPath + subPath); //RealPath : c:/upload/email/date
@@ -201,76 +208,147 @@ public class BoardService {
    }
    
    
-   //전체파일 다운로드
+ //다중파일 다운로드
+ 	public boolean download
+ 	(		 
+ 			HttpServletRequest req,
+ 			HttpServletResponse resp
+ 	)
+ 	{	
+ 		//파일명,	//등록날짜 //이메일계정 가져오기
+ 		HttpSession session = req.getSession();
+ 		BoardDTO dto = (BoardDTO)session.getAttribute("dto");
+ 		
+ 		String email = dto.getWriter();
+ 		String regdate = dto.getRegdate();
+ 		String no = String.valueOf(dto.getNo());
+ 		
+ 		regdate = regdate.substring(0,10);
+ 		
+ 		 
+ 		//1 경로설정
+ 		String downdir="c://upload";	
+ 		String filepath= downdir+"/"+email+"/"+regdate;
+ 		 
+ 		//2 헤더설정
+ 		resp.setContentType("application/octet-stream");
 
-   public boolean download(HttpServletRequest req, HttpServletResponse resp) {
-	   						//매개변수 지정
-       //파일명
+ 		//3 파일검색
+ 		File dir = new File(filepath);
+ 		File[] flist = dir.listFiles(); // 파일들 꺼내오는 작업(절대경로)
+ 		
+ 			
+ 		//4 문자셋 설정
+ 		try {
+ 			
+ 			for(int i=0;i<flist.length;i++)
+ 			{
+ 				
 
-       //파일명, 등록날짜
+ 				String filename=flist[i].getName();
+ 				System.out.println("! : " + filename);
+ 				filename=URLEncoder.encode(filename,"utf-8").replaceAll("\\+", "%20");
+ 				resp.setHeader("Content-Disposition", "attachment; fileName="+filename);
+ 			
+ 				
+ 				//04스트림형성(다운로드 처리)
+ 				FileInputStream fin = new FileInputStream(flist[i]);
+ 				ServletOutputStream bout=resp.getOutputStream();
+ 				
+ 				int read=0;
+ 				byte[] buff = new byte[4096];
+ 				while(true)
+ 				{
+ 					 
+ 					read=fin.read(buff,0,buff.length);		 
+ 					if(read==-1)	 
+ 						break;		 		
+ 					bout.write(buff,0,read);	 
+ 				}
+ 			 
+ 				bout.flush();	
+ 				bout.close();	
+ 				fin.close();
+ 			
+ 			}
+ 			
+ 			return true;
+ 		
+ 		} catch (Exception e) {
+ 			// TODO Auto-generated catch block
+ 			e.printStackTrace();
+ 		}
+ 	
+ 		return false;
+ 	}
+ 	
+ 	//ZIP 으로 압축 다운로드
+	public boolean downloadZIP(BoardDTO dto, HttpServletResponse resp) {
+		
+		
+		//압축파일경로
+		String zipFileName="C://Users/dbsgp/Downloads/ALL.zip";
+		
+		//파일명,	//등록날짜 //이메일계정 가져오기
+ 		String email = dto.getWriter();
+ 		String regdate = dto.getRegdate();
+ 		String no = String.valueOf(dto.getNo());
+ 		regdate = regdate.substring(0,10);
+ 		
+ 		 
+ 		//1 경로설정
+ 		String downdir="c://upload";	
+ 		String subpath= downdir+"/"+email+"/"+regdate+"/"+no+"/";
+ 		
+ 		 
+ 		//2 파일이름 리스트
+ 		String filelist[]=dto.getFilename().split(";"); 
 
-       //이메일계정
-       HttpSession session = req.getSession(); 	//읽고있는 게시물을 session 에서 꺼내기(BoardreadController에서 저장한)
-       BoardDTO dto = (BoardDTO) session.getAttribute("dto");
+ 		
+ 		
+ 		//3 헤더 설정
+ 		resp.setContentType("application/ontet-stream");
+		resp.setHeader("Content-Disposition", "attachment; fileName=ALL.zip");
+		
+ 		//4 문자셋 설정
+ 		try {
+ 			
+ 			//프로그램 -> 파일 방향 ZIPStream 생성
+ 			ZipOutputStream zout = new ZipOutputStream(new FileOutputStream(zipFileName)); //기본스트림(FileOutputStream) 방향으로 ZIP압축 처리하는 보조스트림(ZipOutputStream) 생성
+ 			
+ 			
+ 			for(int i=0;i<filelist.length;i++)
+ 			{
+ 				//파일 -> 프로그램 instream 생성
+ 				FileInputStream fin = new FileInputStream(subpath+filelist[i]);
+ 				
+ 				//ZipEntry 생성, zout에 전달
+ 				ZipEntry ent = new ZipEntry(filelist[i]);	//엔트리명은 파일이름으로 설정
+ 				zout.putNextEntry(ent);						//ZIP방향에 entry 추가
+ 				
+ 				int read=0;
+ 				byte buff[]=new byte[4096];
+ 				while(true)
+ 				{
+ 					read=fin.read(buff,0,buff.length-1); //만들어진 데이터 공간에 buffer크기 만큼 read 받기
+ 					if(read==-1) {
+ 						break;
+ 					}
+ 					zout.write(buff,0,read); //0번째 부터 read(읽어들인) 만큼
+ 				}
+ 				zout.closeEntry();	//엔트리 단위 종료
+ 				fin.close();		//파일 input 스트림 종료
 
-       String email = dto.getWriter();			//dto에서 이메일과 날짜정보 받기
-       String regdate = dto.getRegdate();
-       regdate = regdate.substring(0, 10);
-
-       System.out.println("REGDate : " + regdate);
-
-       //1 경로설정
-       String downdir = "c://upload";
-       String filepath = downdir + "/" + email + "/" + regdate; //filename 외부에서 전달받음 
-
-       //2 헤더설정 	//다운로드용으로 만들기 위한 작업
-       resp.setContentType("application/octet-stream");
-
-       
-       
-       //3 파일 검색 
-       File dir = new File(filepath);
-       File[] flist = dir.listFiles();	//폴더 안에 있는 파일 모두 꺼내기
-      
-       //3 문자셋 설정
-       try {
-    	   
-    	   for(int i =0; i<flist.length;i++) {
-    		   String filename=flist[i].getName();	//지역변수
-    		   
-    		   filename = URLEncoder.encode(filename, "utf-8").replaceAll("\\+", "%20"); //파일이름 인코딩
-    		   resp.setHeader("Content-Disposition", "attachment; fileName=" ); //헤더에 파일이름 전달
-    	   }
-    	   
-
-           //04스트림형성(다운로드 처리)
-           FileInputStream fin = new FileInputStream(flist[i]);	
-           ServletOutputStream bout = resp.getOutputStream();	//getOutputStream() 브라우저 방향으로 전달할 내용을 bout 에 저장
-
-           int read = 0;
-           byte buff[] = new byte[4096];
-           while(true){
-               read = fin.read(buff,0,buff.length);	//buffer공간에 0번째부터 buffer길이까지 받기 
-               if(read == -1)
-                   break;
-               bout.write(buff,0,read);			//브라우저 방향으로 buffer에 저장된 내용 전달
-
-           }
-           bout.flush();
-           bout.close();
-           fin.close();
-           
-           return true;
-
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
-
-       //등록날짜
-
-       //c:\\upload\\이메일명\\등록날짜\\파일들.
-
-       return false;
-   }
+ 				
+ 			}
+ 			zout.close();			//zipoutput 스트림 종료
+ 			
+ 			
+		return true;
+	}catch(Exception e) {
+		e.printStackTrace();
+	}
+ 		return false;
+	}
 }
 
