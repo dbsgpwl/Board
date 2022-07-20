@@ -11,6 +11,19 @@
 
 </head>
 <body>
+
+<%
+	String MSG =(String)session.getAttribute("MSG");
+	if(MSG!=null)
+	{
+		%>
+		<script>
+			alert(<%=MSG%>);
+		</script>
+		<%
+		session.setAttribute("MSG", null);
+	}
+%>
    <div class="contanier-md" id="wrapper" style="margin:100px auto;">
       <!-- TopMenu -->
       <%@include file="/resources/includes/topmenu.jsp" %>
@@ -26,48 +39,51 @@
            </ol>
          </nav>
       </div>
-      <h1>글내용</h1>
-      
-      <%@page import="com.korea.dto.*" %>
-      <%
-      	BoardDTO dto = (BoardDTO)request.getAttribute("dto");
-      	String nowPage = (String)request.getAttribute("nowPage");
-      	String [] filelist=null;
-      	String [] filesize=null;
-      	if(dto.getFilename()!=null)
-      	{	
-      		filelist = dto.getFilename().split(";");
-      		filesize = dto.getFilesize().split(";");
-      	}
-      	
-      	//시작번호 계산
-		int np = Integer.parseInt(nowPage);
-		int numPerPage=10;
-		int start=(np*numPerPage)-numPerPage+1;
+     	 <h1>글내용</h1>                               
+			<%@page import="com.korea.dto.*" %>
+			<%
+				BoardDTO dto = (BoardDTO)request.getAttribute("dto");
+				String nowPage=(String)request.getAttribute("nowPage");
+				
+				String[] filelist=null;
+				String[] filesize=null;
+				if(dto.getFilename()!=null)
+				{
+					filelist = dto.getFilename().split(";");
+					filesize = dto.getFilesize().split(";");
+				}
+				
+				//시작번호 계산
+				int np = Integer.parseInt(nowPage);
+				int numPerPage=10;
+				int start=(np*numPerPage)-numPerPage+1;
+				
+				//끝번호 계산 
+				int end=np*numPerPage;
 		
-		//끝번호 계산 
-		int end=np*numPerPage;
-		
-      %>
-      <form action="#" method ="post">
-         <input name = "title" class = "form-control mb-3 w-50" value="<%=dto.getTitle() %>"/ >
-         <input name="writer" class="form-control mb-3 w-50" value="<%=dto.getWriter() %>"/>
+     			 %>
+      <form action="" method ="post">
+         <input id=title name = "title" class = "form-control mb-3 w-50" value="<%=dto.getTitle() %>"/ >
+         <input name="writer" class="form-control mb-3 w-50" value="<%=dto.getWriter() %>" disabled/>
         
-         <textarea name = "content"  class = "form-control mb-3 w-50" style= "height:500px;"><%=dto.getContent() %>
+         <textarea id=content name = "content"  class = "form-control mb-3 w-50" style= "height:500px;"><%=dto.getContent() %>
          </textarea>
        
          
-         <input type = submit name ="글수정" class = "btn btn-dark"> 
-         <a href="#" class = "btn btn-dark">리스트</a>
-         <a href="#" class = "btn btn-dark">글삭제</a>
+        <a href="#" class = "btn btn-dark"  data-bs-toggle="modal" data-bs-target="#staticBackdrop2">글수정</a>
+         <a href="/Board/list.do?nowPage=<%=nowPage %>&start=<%=start %>&end=<%=end %>" class = "btn btn-dark">리스트</a>
+         <a href="#" class = "btn btn-dark" data-bs-toggle="modal" data-bs-target="#staticBackdrop3">글삭제</a>
+         
+         
+         
         
       <!-- 첨부파일 -->
 			<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
 			  첨부파일 보기
 			</button>
       </form>    
-      
-			
+      		
+							
 			<!-- Modal -->
 			<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 			  <div class="modal-dialog modal-dialog-centered">
@@ -77,82 +93,86 @@
 			        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			      </div>
 			      <div class="modal-body">
-			      <!-- 첨부파일 -->
-			      <%@page import="java.net.URLEncoder" %>
-			        <%
-			        	if(filelist!=null){//파일이름이 있다면 
-			        		
-			         		for (int i=0; i<filelist.length;i++){
-			         			
-			         			String tmpfilename = filelist[i].substring(0,filelist[i].lastIndexOf("_"));
-			         			tmpfilename += filelist[i].substring(filelist[i].lastIndexOf("."),filelist[i].length());
-			         			
-			         			filelist[i] = URLEncoder.encode(filelist[i], "utf-8").replaceAll("\\+", "%20"); //인코딩된 파일이름
-			         			
-			         			
-			         			out.println("<a href=/Board/download.do?filename="+filelist[i]+">"+tmpfilename+"("+filesize[i]+"byte)</a><br>");
-				        
+			     <!-- 첨부파일  -->
+			         	<%@page import="java.net.URLEncoder" %>
+			         	<%		         	
+			         		if(filelist!=null)
+			         		{
+								for(int i=0;i<filelist.length;i++){	
+									
+									String tmpfilename = filelist[i].substring(0,filelist[i].lastIndexOf("_"));
+									tmpfilename += filelist[i].substring(filelist[i].lastIndexOf("."),filelist[i].length());
+									
+									filelist[i] = URLEncoder.encode(filelist[i],"utf-8").replaceAll("\\+", "%20");							 
+										out.println("<a href=/Board/download.do?filename="+filelist[i]+">"+tmpfilename+"("+filesize[i]+" byte)</a><br>");
+									}
 			         		}
-			        	
-			        	
-			        		
-			        		}else{
-			        			out.println("파일 없음");
-			        		}
-		         		
-         			%>
-         			
+			         		else
+			         		{
+			         			out.println("파일 없음");
+			         		}
+			         		
+						%>
+			         
 			      </div>
-				      <div class="modal-footer">
-				      
-				        <a  id="downall" class="btn btn-dark" href="#"> 모두 받기(NoZIP)</a>
-				        <a class="btn btn-dark" href="/Board/downloadAll.do">모두받기(ZIP)</a>
-			        
+			      <div class="modal-footer">	
+			      	       
+			        <a id="downall" class="btn btn-primary" href="#">모두받기(NoZIP)</a>
+			        <a  class="btn btn-primary" href="/Board/downloadAll.do">모두받기(ZIP)</a>
+			     
 			        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
 			      </div>
 			      
+			      
 			      <!-- 다중파일 무압축 받기 -->
-			      <form name="multiform">
-			      	<%
-			      	
-			      		for(int i=0; i<filelist.length; i++){
-			      			
-			      	%>
-			      			<input type="hidden" name="file" value=<%=filelist[i] %> /> <%-- <%=filelist[i] %> :인코딩 된 파일 리스트 이름들 --%>
-			      	<%		
-			      		}
-			      	%>
+			      <form name=multiform>
+			      		<%
+			      			for(int  i=0;i<filelist.length;i++)
+			      			{
+			      				%>
+			      				<input type=hidden name=file value=<%=filelist[i] %>>
+			      				<%
+			      			}
+			      		%>
 			      </form>
 			      
-			 <script>
-				    $(document).ready(function () {
-				    	
-				        form = document.multiform;
-				        var iFrameCnt = 0;			//프레임 개수 확인, 프레임 이름 지정
-				
-				        $('#downall').click(function (event){				//다운로드 이미지 실행
-				        	
-				            for (i = 0; i < form.childElementCount; i++) {	//form 하위에 있는 자식태그의 개수만큼 반복
-				
-				                fileName = form[i].value;
-				                var url = "/Board/download.do?filename=" + fileName;		//전달할 url 경로 넣어주기
-				                fnCreateIframe(iFrameCnt);	//보이지 않는 iframe 생성, name 은 숫자로
-				                $("iframe[name=" + iFrameCnt + "]").attr("src", url);
-				                iFrameCnt++;
-				                fnSleep(1000);		//1초
-				            }
-				        });
-				        fnCreateIframe = function (name){
-				
-				            var frm = $('<iframe name = "' + name + '" style = " display: none;"></iframe>');
-				            frm.appendTo("body");
-				        }
-				        fnSleep = function (delay) {
-				            var start = new Date().getTime();
-				            while (start + delay > new Date().getTime());	//언제까지 반복할 것인지! 현재시간보다 Start+delay가 크다면 반복
-				        };
-				    });
-				</script>
+			      <script>
+			      $(document).ready(function(){
+			            
+			    	  	form = document.multiform;
+			            var iFrameCnt = 0; //프레임 개수확인 ,프레임 이름 지정
+			               
+			               $('#downall').click(function(){ //다운로드 이미지 실행
+			                   
+			                  	for(i=0;i<form.childElementCount;i++)
+			                	{
+			                       fileName =form[i].value;
+			                       var url = "/Board/download.do?filename="+fileName;                           
+			                       fnCreateIframe(iFrameCnt); // 보이지 않는 iframe 생성, name는 숫자로  
+			                       $("iframe[name=" + iFrameCnt + "]").attr("src", url);     
+			                       iFrameCnt++;      
+			                       fnSleep(1000); 
+			                	}
+			                  
+			                   
+			               });
+							fnCreateIframe = function (name){
+			                   
+			                   var frm = $('<iframe name="' + name + '" style="display: none;"></iframe>');
+			                   frm.appendTo("body");
+			 
+			               } 
+			              fnSleep = function (delay){
+			                   
+			                   var start = new Date().getTime();
+			                   while (start + delay > new Date().getTime());
+			 
+			               };
+			               
+			               
+			               
+			        });
+			      </script>
 			      
 			    </div>
 			  </div>
@@ -160,5 +180,77 @@
 			
         
    </div>
-</body>
+   
+    			<!-- 글수정 modal -->
+					<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+					  <div class="modal-dialog modal-dialog-centered">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="staticBackdropLabel">패스워드확인</h5>
+					        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					      </div>
+					      
+					      <form action="/Board/update.do" method="post" name="updatefrm">
+						      <div class="modal-body">
+						     	 <input type=password class="form-control" name=pwd placeholder="비밀번호 입력" />
+						     	 <input type=hidden name=title />
+						     	 <input type=hidden name=content />
+						     	 <input type=hidden name=nowPage value=<%=nowPage %> >
+						      </div>
+						      
+						      <div class="modal-footer">
+						        <button type="button" class="btn btn-primary" id=updatebtn>수정요청</button>
+						        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+						      </div>
+					      </form>
+					      
+					<script>
+					
+						$(document).ready(function(){
+							$('#updatebtn').on("click",function(){
+								form=document.updatefrm;
+								form[1].value = $("#title").val();
+								form[2].value = $("#content").val();
+								form.submit();
+								
+							});
+						});
+						
+					</script>
+					
+					    </div>
+					  </div>
+					</div>
+					
+					
+					<!-- 글 삭제 모달 -->
+					<div class="modal fade" id="staticBackdrop3" data-bs-backdrop="static"
+					      data-bs-keyboard="false" tabindex="-1"
+					      aria-labelledby="staticBackdropLabel" aria-hidden="true">
+					      <div class="modal-dialog  modal-dialog-centered">
+					         <div class="modal-content">
+					            <div class="modal-header">
+					               <h5 class="modal-title" id="staticBackdropLabel">패스워드 확인</h5>
+					               <button type="button" class="btn-close" data-bs-dismiss="modal"
+					                  aria-label="Close"></button>
+					            </div>
+					            
+					            
+					            <form action="/Board/delete.do" method="post" name="deletefrm">
+					            <div class="modal-body">...
+					               <input type=password class="form-control"name=pwd placeholder="INSERT PASSWORD">
+					               <input type=hidden name=title>
+					               <input type=hidden name=content>
+					               <input type=hidden name=nowPage value=<%=nowPage%>>
+					               </div>
+					            <div class="modal-footer">            
+					               <button type="button" class="btn btn-primary" id=deletebtn>삭제요청</button>
+					               <button type="button" class="btn btn-secondary"
+					                  data-bs-dismiss="modal">닫기</button>
+					            </div>
+					            </form>            
+					         </div>
+					      </div>
+					   </div>
+	</body>
 </html>

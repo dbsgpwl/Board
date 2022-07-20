@@ -62,22 +62,17 @@ public class BoardPostController implements SubController {
 				
 				boolean result=false;
 				long size = parts.get(3).getSize(); //파일 사이즈가 없는경우 -> 파일이 없음!
+				
 				if(size==0)	{//파일전달이 안된 경우(파일 미포함 글쓰기 요청)
-					System.out.println("1");
 					result = service.PostBoard(dto);
 				}
 				else {			//파일이 포함되어 있는 경우 (파일 포함 글쓰기 요청 분기처리)
-					System.out.println("2");
 					result = service.PostBoard(dto,parts);
 				}
 				// 4 뷰 이동
 				if(result)
 				{
-//					int tcnt=service.getTotalCnt();
-//					req.setAttribute("tcnt", tcnt);
-//					ArrayList<BoardDTO> list = (ArrayList<BoardDTO>)service.getBoardList(1, 10);
-//					req.setAttribute("list", list);
-//					req.getRequestDispatcher("/WEB-INF/board/list.jsp?nowPage=1").forward(req,resp);
+//					
 					resp.sendRedirect("/Board/list.do");
 					return ;
 				}

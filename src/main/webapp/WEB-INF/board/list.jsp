@@ -17,18 +17,18 @@
 		<!-- Nav -->
 		<%@include file="/resources/includes/nav.jsp" %>
 		<!-- MainContents -->
-		<div id="maincontents" style="margin-top:15px;">
 		
-		<!-- PagePath -->
+		<div id=maincontents style=margin-top:15px;">
+			
+			<!-- PagePath -->
 			<div>
 				<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-				  <ol class="breadcrumb">
-				    <li class="breadcrumb-item"><a href="#">Home</a></li>
-				    <li class="breadcrumb-item active" aria-current="page">Library</li>
-				  </ol>
+					<ol class="breadcrumb">
+					    <li class="breadcrumb-item"><a href="#">Home</a></li>
+					    <li class="breadcrumb-item active" aria-current="page">Board</li>
+					</ol>
 				</nav>
 			</div>
-			
 			<h1>자유 게시판</h1>
 			
 			<%
@@ -48,13 +48,14 @@
 				int nowBlock=1;			//현재 페이징 블럭 수 
 			%>
 			
+			
 			<%
 				//상단의 현재 페이지 번호 변경 위한 처리
-				if(request.getAttribute("nowPage")!=null)
-					nowPage=
-					Integer.parseInt(
-					(String)request.getAttribute("nowPage")
-					);
+	 			if(!request.getParameter("nowPage").equals("null"))
+				{
+					nowPage =Integer.parseInt(request.getParameter("nowPage"));
+					
+				} 
 				 
 			%>
 			
@@ -67,6 +68,7 @@
 				//현재 블럭숫자 계산 
 				nowBlock = (int)Math.ceil((double)nowPage / pagePerBlock);
 			%>
+			
 			
 			<script>
 				/* 페이징 처리함수- 페이지 번호를 받아 해당 페이지를 표시*/
@@ -144,6 +146,8 @@
 				</tr>
 			</table>
 			
+			
+				
 			<table class="table">
 				<tr>
 					<th> NO </th>
@@ -161,7 +165,7 @@
 				%>
 				<tr>
 					<td><%=list.get(i).getNo() %></td>
-					<td><a href="javascript:read('<%=list.get(i).getNo() %>')"><%=list.get(i).getTitle() %></a></td> <!-- 타이틀에 링크를 삽입하여 클릭시 해당 게시물로 이동! -->
+					<td><a href="javascript:read('<%=list.get(i).getNo()%>')"><%=list.get(i).getTitle() %></a></td>
 					<td><%=list.get(i).getWriter() %></td>
 					<td><%=list.get(i).getRegdate() %></td>
 					<td><%=list.get(i).getCount() %></td>
@@ -225,7 +229,7 @@
 				</tr>
 			</table>
 			
-			<a href="/Board/post.do">글쓰기</a> <!-- flag 미포함 -->
+			
 		</div>
 		<!-- Footer -->
 	</div>

@@ -3,6 +3,7 @@ package com.korea.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class BoardService {
    BoardDAO dao = BoardDAO.getInstance();
    
    private String UploadPath = "c://upload/";//업로드 폴더 지정(멤버변수 c://upload\)
+
    
    
    //싱글톤 패턴
@@ -35,17 +37,19 @@ public class BoardService {
    }
    private BoardService() {}
    
-   public List<BoardDTO> getBoardList(int start, int end){
-      return dao.Select(start, end);
-   }
-   
-   public int getTotalCount() {
-      return dao.getTotalCount();
-   }
-   
-   public boolean PostBoard(BoardDTO dto) {
-      return dao.Insert(dto);
-   }
+   public List<BoardDTO> getBoardList(int start,int end)
+	{
+		return dao.Select(start, end);
+	}
+	
+	public int getTotalCnt() {
+		return dao.getTotalCount();
+	}
+	
+	public boolean PostBoard(BoardDTO dto)
+	{
+		return dao.Insert(dto);
+	}
    
    
    //파일포함 글쓰기 서비스
@@ -64,7 +68,7 @@ public class BoardService {
       //게시물 번호
       String no = String.valueOf(dao.getLastNo()+1);
       
-      String subPath = email + "/" + date +no;
+      String subPath = email + "/" + date + "/"+no;
       
       //file클래스 경로 연결하기
       File RealPath = new File(UploadPath + subPath); //RealPath : c:/upload/email/date
@@ -85,71 +89,69 @@ public class BoardService {
       //Parts의 각 Part를 write()
       System.out.println("Parts : "+parts.size());
       
-      //files 파트만 확인해서 파일 이름 추출
-      for(Part part : parts) {
-         if(part.getName().equals("files")){ 
-            
-            String FileName = getFileName(part); //파일이름 가져오기
-            
-           
-            
-            
-            try {
-            	
-            
-            int start=FileName.lastIndexOf(".");;		//끝에서부터 . 에 대한 idx 번호 찾기
-            int end=FileName.length();;					
-            String ext = FileName.substring(start,end);	//파일명 잘라내기(확장자만)
-            FileName=FileName.substring(0,start);		//파일명 잘라내기(확장자 제외)
-            
-            //파일명 + _UUID + 확장자
-            FileName=FileName+"_"+UUID.randomUUID().toString()+ext; //파일이름 중복방지
-            
-            
+    //5) Parts의 각 Part 를 write()
+    		System.out.println("Parts : "+ parts.size());
+    		for(Part part : parts)
+    		{
+    			if(part.getName().equals("files"))
+    			{
+    				String FileName=getFileName(part); //파일이름 가져오기
 
-            //DTO 저장을 위한 파일명 buffer에 추가
-            totalFilename.append(FileName+ ";");
-            //DTO 저장을 위한 파일사이즈 buffer에 추가
-            totalFilesize.append(String.valueOf(part.getSize()+ ";"));
-            
-           
-            //파일 업로드
-               part.write(RealPath + "/" + FileName); //part.write(파일경로)
-          
-            } catch (Exception e) {
-               e.printStackTrace();
-            }
-         }
-      }
-      
-      //Dto에 총 파일명과 파일사이즈 저장
-      
-      dto.setFilename(totalFilename.toString());      
-      dto.setFilesize(totalFilesize.toString());      
-
-      
-      //DAO 파일명 전달
-      return dao.Insert(dto);
-   }
+    	
+    				
+    				//파일명 ,확장자명 구분하기
+    				
+    				 
+    				int start=FileName.lastIndexOf(".");		//확장자구하기 위한 시작idx
+    				int end=FileName.length();					//확장자구하기 위한 끝idx
+    				String ext=FileName.substring(start,end);	//파일명잘라내기(확장자만)
+    				FileName = FileName.substring(0,start);	//파일명잘라내기(확장자제외)
+    				
+    				//파일명 + _UUID + 확장자
+    				FileName=FileName+"_"+UUID.randomUUID().toString()+ext;
+    				
+    				//DTO저장위한 파일명 buffer에추가
+    				totalFilename.append(FileName+";");
+    				//DTO저장위한 파일사이즈 buffer에추가				 
+    				totalFilesize.append(String.valueOf(part.getSize())+";");
+    				
+    				
+    				
+    				 try {
+    					part.write(RealPath+"/"+FileName); //파일업로드
+    				} catch (IOException e) {	 
+    					e.printStackTrace();
+    				}
+    			}
+    		}
+    		
+    		//Dto에 총파일명과 총파일사이즈를 저장
+    		dto.setFilename(totalFilename.toString());
+    		dto.setFilesize(totalFilesize.toString());
+    		
+    		//Dao 파일명전달 
+    		return dao.Insert(dto);
+    	}
    
-   //파일명 추출(PostBoard(dto,parts)가 사용)
-   private String getFileName(Part part) {
-      String contentDisp = part.getHeader("content-disposition");
-      //System.out.println(contentDisp);
-      String[] arr = contentDisp.split(";"); //배열화
-      String Filename = arr[2].substring(11, (arr[2].length()-1));
-      return Filename;
-   }
-   
-   //게시물 하나 가져오기
-   public BoardDTO getBoardDTO(int no) {
-	   return dao.Select(no);
-   }
-   
-   //단일파일 다운로드
-
-   public boolean download(String filename, HttpServletRequest req, HttpServletResponse resp) {
-	   						//매개변수 지정
+		 //파일명추출(PostBoard(dto,parts)가 사용)
+		 	private String getFileName(Part part)
+		 	{
+		 		String contentDisp=part.getHeader("content-disposition");
+		 		System.out.println(contentDisp);
+		 		String[] arr = contentDisp.split(";"); // 배열화 		
+		 		String Filename=arr[2].substring(11,arr[2].length()-1);	
+		 		return Filename;
+		 	}
+ 	
+		   //게시물 하나 가져오기
+		   public BoardDTO getBoardDTO(int no) {
+			   return dao.Select(no);
+		   }
+		   
+		   //단일파일 다운로드
+		
+		   public boolean download(String filename, HttpServletRequest req, HttpServletResponse resp) {
+			   						//매개변수 지정
        //파일명
 
        //파일명, 등록날짜
@@ -161,12 +163,12 @@ public class BoardService {
        String email = dto.getWriter();			//dto에서 이메일과 날짜정보 받기
        String regdate = dto.getRegdate();
        regdate = regdate.substring(0, 10);
+       String no = String.valueOf(dto.getNo());
 
-       System.out.println("REGDate : " + regdate);
 
        //1 경로설정
        String downdir = "c://upload";
-       String filepath = downdir + "/" + email + "/" + regdate + "/" + filename; //filename 외부에서 전달받음 
+       String filepath = downdir + "/" + email + "/" + regdate + "/" +no+"/"+ filename; //filename 외부에서 전달받음 
 
        //2 헤더설정 	//다운로드용으로 만들기 위한 작업
        resp.setContentType("application/octet-stream");
@@ -228,7 +230,7 @@ public class BoardService {
  		 
  		//1 경로설정
  		String downdir="c://upload";	
- 		String filepath= downdir+"/"+email+"/"+regdate;
+ 		String filepath= downdir+"/"+email+"/"+regdate+"/"+no;
  		 
  		//2 헤더설정
  		resp.setContentType("application/octet-stream");
@@ -352,6 +354,40 @@ public class BoardService {
 	
 	public void CountUp(int no) {
 		dao.CountUp(no);
+	}
+	
+	public boolean UpdateBoard(BoardDTO dto) {
+		return dao.Update(dto);
+	}
+	
+	public boolean BoardRemove(BoardDTO dto) {
+		
+		//첨부파일
+		String email = dto.getWriter();
+		String regdate= dto.getRegdate();
+		regdate = regdate.substring(0,10); //날짜만(시간 자르기)
+		String no = String.valueOf(dto.getNo());
+		
+		String dirpath = UploadPath+email+"/"+regdate+"/"+no;
+		
+		//첨부파일 폴더 경로
+		File dir = new File(dirpath);			//폴더
+		
+		
+		//폴더 경로로부터 파일리스트 가져오기
+		File [] filelist = dir.listFiles();		//파일
+		
+		//첨부파일 모두 삭제
+		for ( File filename : filelist) {	//파일리스트 안에 있는 파일이름을 하나씩 삭제 (반복)
+			
+			filename.delete();				//파일삭제완료
+			
+		}
+		
+		//첨부파일 폴더 삭제
+		dir.delete();						//폴더삭제완료
+		
+		return dao.Delete(dto);
 	}
 }
 

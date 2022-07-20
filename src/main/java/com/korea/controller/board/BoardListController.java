@@ -2,6 +2,7 @@ package com.korea.controller.board;
 
 import java.util.List;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,16 +42,22 @@ public class BoardListController implements SubController{
 			//서비스실행
 			
 			List<BoardDTO> list = service.getBoardList(start, end); //게시물 시작, 끝번호 조회
-			int tcnt = service.getTotalCount(); //게시물 총건수 조회
+			int tcnt = service.getTotalCnt(); //게시물 총건수 조회
 			
 			req.setAttribute("list", list);
 			req.setAttribute("tcnt", tcnt);
 			
 			//페이징 처리
-			req.setAttribute("nowPage", nowPage);
+			//req.setAttribute("nowPage", nowPage);
 			
 			
-			req.getRequestDispatcher("/WEB-INF/board/list.jsp").forward(req, resp);
+			//쿠키생성(게시글읽기 새로고침시 중복Count방지)
+			Cookie init = new Cookie("init","true");
+			resp.addCookie(init);
+			
+			
+			
+			req.getRequestDispatcher("/WEB-INF/board/list.jsp?nowPage="+nowPage).forward(req, resp);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
