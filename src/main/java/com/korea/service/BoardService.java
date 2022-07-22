@@ -21,6 +21,7 @@ import javax.servlet.http.Part;
 
 import com.korea.dao.BoardDAO;
 import com.korea.dto.BoardDTO;
+import com.korea.dto.ReplyDTO;
 public class BoardService {
    BoardDAO dao = BoardDAO.getInstance();
    
@@ -362,32 +363,42 @@ public class BoardService {
 	
 	public boolean BoardRemove(BoardDTO dto) {
 		
-		//첨부파일
-		String email = dto.getWriter();
-		String regdate= dto.getRegdate();
-		regdate = regdate.substring(0,10); //날짜만(시간 자르기)
-		String no = String.valueOf(dto.getNo());
-		
-		String dirpath = UploadPath+email+"/"+regdate+"/"+no;
-		
-		//첨부파일 폴더 경로
-		File dir = new File(dirpath);			//폴더
-		
-		
-		//폴더 경로로부터 파일리스트 가져오기
-		File [] filelist = dir.listFiles();		//파일
-		
-		//첨부파일 모두 삭제
-		for ( File filename : filelist) {	//파일리스트 안에 있는 파일이름을 하나씩 삭제 (반복)
+		//첨부파일 경로 확인 
+		if(dto.getFilename()!=null)
+		{
+			String email = dto.getWriter();
+			String regdate = dto.getRegdate();
+			regdate = regdate.substring(0,10);
+			String no = String.valueOf(dto.getNo());
 			
-			filename.delete();				//파일삭제완료
-			
+			String dirpath = UploadPath+email+"/"+regdate+"/"+no;
+			//첨부파일 폴더 경로
+			File dir = new File(dirpath);
+			//폴더 경로로 부터 파일리스트 가져오기
+			File [] filelist = dir.listFiles();
+			//첨부파일 모두 삭제
+			for(File filename : filelist)
+			{
+				filename.delete();
+			}
+			//첨부파일 폴더 삭제 
+			dir.delete();
 		}
 		
-		//첨부파일 폴더 삭제
-		dir.delete();						//폴더삭제완료
-		
 		return dao.Delete(dto);
+	}
+	
+	
+	//댓글 달기
+	public boolean replypost(ReplyDTO rdto) {
+		
+		return dao.replypost(rdto);
+	}
+	public ArrayList<ReplyDTO> getReplaylist(int bno) {
+		return dao.getReplylist(bno);
+	}
+	public int getTotalReplyCount(int bno) {
+		return dao.getTotalReplyCount(bno);
 	}
 }
 

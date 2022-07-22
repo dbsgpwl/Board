@@ -1,5 +1,8 @@
 package com.korea.controller.board;
 
+import java.io.IOException;
+
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -34,6 +37,22 @@ public class BoardDeleteController implements SubController {
 		//서비스
 		
 		//뷰
+		
+		try {
+			int numPerPage=10;
+			int np = Integer.parseInt(nowPage);
+			int start=(np*numPerPage)-numPerPage+1;
+			int end=(np*numPerPage);
+			req.getRequestDispatcher("/Board/list.do?nowPage="+nowPage+"&start="+start+"&end="+end)
+			.forward(req, resp);
+
+		} catch (ServletException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

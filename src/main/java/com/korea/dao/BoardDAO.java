@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.korea.dto.BoardDTO;
+import com.korea.dto.ReplyDTO;
 
 public class BoardDAO {
 
@@ -176,10 +177,10 @@ public class BoardDAO {
 		{
 			try 
 			{
-				pstmt=conn.prepareStatement("select /*+INDEX_DESC(tbl_board PK_NO) */ rownum rn,no from tbl_board where rownum=1");
+				pstmt=conn.prepareStatement("select last_number from user_sequences where sequence_name='TBL_BOARD_SEQ'");
 				rs = pstmt.executeQuery();
 				rs.next();
-				int no = rs.getInt(2); //no값
+				int no = rs.getInt(1); //no값
 				
 				return no;
 			}catch(Exception e) {
@@ -233,21 +234,99 @@ public class BoardDAO {
 		}
 		
 		//글삭제
-		public boolean Delete(BoardDTO dto) {
+		public boolean Delete(BoardDTO dto)
+		{
 			
 			try {
-				
-				//DB 삭제
-				
-				
+				//DB삭제
+				pstmt = conn.prepareStatement("delete from tbl_board where no=?");
+				pstmt.setInt(1,dto.getNo());
+				int result = pstmt.executeUpdate();
+				if(result>0)
+					return true;
 			}catch(Exception e) {
 				e.printStackTrace();
-			}finally {
-				
+			}finally{
+				try {pstmt.close();}catch(Exception e) {e.printStackTrace();}
 			}
 			return false;
 		}
 		
+		//댓글달기
+		public boolean replypost(ReplyDTO rdto) {
+			try {
+				pstmt = conn.prepareStatement("insert into tbl_reply values(REPLY_SEQ.NEXTVAL,?,?,?,sysdate)");
+				pstmt.setInt(1, rdto.getBno());
+				pstmt.setString(2, rdto.getWriter());
+				pstmt.setString(3, rdto.getContent());
+				int result=pstmt.executeUpdate();
+				if(result>0)
+					return true;
+			}catch(Exception e) {
+				e.printStackTrace();
+			}finally {
+				try {pstmt.close();}catch(Exception e) {e.printStackTrace();}
+			}
+			return false;
+		
+		}
+		
+		//댓글 가져오기(조회하기)
+		public ArrayList<ReplyDTO> getReplylist(int bno) {
+			ArrayList<ReplyDTO> list = new ArrayList();
+			ReplyDTO dto = null;
+			try {
+				
+				String sql=
+						 "select * from tbl_reply where bno=? order by rno desc";
+				
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setInt(1, bno);
+				
+				rs=pstmt.executeQuery();
+				
+				while(rs.next())
+				{
+					dto=new ReplyDTO();
+					dto.setRno(rs.getInt("rno"));
+					dto.setBno(rs.getInt("bno"));
+					dto.setContent(rs.getString("content"));
+					dto.setWriter(rs.getString("writer"));
+					dto.setRegdate(rs.getString("regdate"));
+					list.add(dto);
+				}
+			}catch(Exception e) {
+				e.printStackTrace();
+			}finally{
+				try {rs.close();}catch(Exception e) {e.printStackTrace();}
+				try {pstmt.close();}catch(Exception e) {e.printStackTrace();}
+			}
+			return list;
+		}
+		public int getTotalReplyCount(int bno) {
+			int tcnt=0;
+			try {
+				String sql=
+						 "select count(*) from tbl_reply where bno=?"; //게시물 번호에 해당되는 건수 조회
+				
+				pstmt = conn.prepareStatement(sql);
+				pstmt.setInt(1, bno);
+				
+				rs=pstmt.executeQuery();
+				rs.next();
+				
+				tcnt=rs.getInt(1); 
+			} catch (Exception e) {
+				e.printStackTrace();
+			}finally{
+				try {rs.close();}catch(Exception e) {e.printStackTrace();}
+				try {pstmt.close();}catch(Exception e) {e.printStackTrace();}
+			}
+			return tcnt;
+		}
+		
+		
+
    
 }
 
@@ -258,4 +337,4 @@ public class BoardDAO {
 //	}finally {
 //		
 //	}
-//	return false;
+//	return null;
