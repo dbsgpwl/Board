@@ -5,6 +5,8 @@ public class MemberDTO {
 	private String pwd;
 	private String addr1;
 	private String addr2;
+	private String zipcode;
+	
 	private int grade; //일반 : 1 관리자 : 2 익명 :0
 	public MemberDTO() { //별다른 처리 안하면 디폴트생성자로 grade를 1로 
 		grade=1;
@@ -39,11 +41,19 @@ public class MemberDTO {
 	public void setGrade(int grade) {
 		this.grade = grade;
 	}
+	
+	public String getZipcode() {
+		return zipcode;
+	}
+	public void setZipcode(String zipcode) {
+		this.zipcode = zipcode;
+	}
 	@Override
 	public String toString() {
-		return "MemberDTO [email=" + email + ", pwd=" + pwd + ", addr1=" + addr1 + ", addr2=" + addr2 + ", grade="
-				+ grade + "]";
+		return "MemberDTO [email=" + email + ", pwd=" + pwd + ", addr1=" + addr1 + ", addr2=" + addr2 + ", zipcode="
+				+ zipcode + ", grade=" + grade + "]";
 	}
+	
 	
 	
 }

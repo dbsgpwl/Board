@@ -23,7 +23,7 @@ public class LoginController implements SubController{
 		try {
 			if(email==null || pwd==null)
 			{
-				resp.sendRedirect("/");
+				resp.sendRedirect("/index.do");
 			}
 			//서비스 실행
 			//MemberService -> DAO -> email 있는지 DB로 확인(해당 email의 pw를 꺼내오기)
@@ -45,7 +45,7 @@ public class LoginController implements SubController{
 					session.setMaxInactiveInterval(60*5);
 					
 					//View 이동
-					resp.sendRedirect("/main.jsp"); //Login.jsp에서 LOGIN 클릭 시 main.jsp로 리다이렉션!
+					resp.sendRedirect("/main.do"); //Login.jsp에서 LOGIN 클릭 시 main.jsp로 포워딩
 					
 					
 				}
@@ -53,7 +53,7 @@ public class LoginController implements SubController{
 				{
 					//패스워드 불일치
 					req.setAttribute("MSG", "패스워드 불일치");
-					req.getRequestDispatcher("/").forward(req,resp);
+					req.getRequestDispatcher("/index.do").forward(req,resp);
 				}
 				
 			}
@@ -61,7 +61,7 @@ public class LoginController implements SubController{
 			{
 				//아이디 조회 실패.. 해당 아이디가 없습니다.
 				req.setAttribute("MSG", "해당 아이디가 없습니다.");
-				req.getRequestDispatcher("/").forward(req,resp);
+				req.getRequestDispatcher("/index.do").forward(req,resp);
 			}
 			
 			

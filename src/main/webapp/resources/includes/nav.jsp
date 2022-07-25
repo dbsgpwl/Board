@@ -4,7 +4,7 @@
 
 	<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #FFF8E5;" >
 		  <div class="container-fluid">
-		    <a class="navbar-brand ms-3" href="/main.jsp"><i class="bi bi-house-heart" style="font-size:3rem; color:pink; "></i></a>
+		    <a class="navbar-brand ms-3" href="/main.do"><i class="bi bi-house-heart" style="font-size:3rem; color:pink; "></i></a>
 		    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 		      <span class="navbar-toggler-icon"></span>
 		    </button>

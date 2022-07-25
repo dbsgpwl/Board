@@ -6,8 +6,8 @@
 <meta charset="UTF-8">
 <title>로그인</title>
 
-<%@include file="resources/includes/link.jsp" %>
-<link rel="stylesheet" href="resources/css/common.css">
+<%@include file="/resources/includes/link.jsp" %>
+<link rel="stylesheet" href="/resources/css/common.css">
 </head>
 <body>
 	<%

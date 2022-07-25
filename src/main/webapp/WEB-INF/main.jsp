@@ -7,7 +7,7 @@
 <title>메인 페이지</title>
 
 <%@include file="/resources/includes/link.jsp" %>
-<link rel="stylesheet" href="resources/css/common.css">
+<link rel="stylesheet" href="/resources/css/common.css">
 
 </head>
 <body>

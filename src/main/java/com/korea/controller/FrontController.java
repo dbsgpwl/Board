@@ -53,6 +53,9 @@ public class FrontController extends HttpServlet{
 		list.put("/MemberInfo.do", new MemberInfoController());
 		list.put("/MemberUpdate.do", new MemberUpdateController());
 		
+		//기본 페이지 
+		list.put("/index.do", new IndexController());
+		list.put("/main.do", new MainController());
 		//인증관련
 		list.put("/Login.do", new LoginController()); //로그인
 		list.put("/Logout.do", new LogoutController()); //로그아웃
