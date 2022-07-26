@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <link rel="shortcut icon" href="#">  <!-- favicon.ico 오류 404 메시지 방지 -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -55,21 +56,18 @@
 	<script>
 	$.ajax({
 		type : "GET",
-		dataType : "json",
-		url : "/ShowBus.Info",
-		contentType : "application/json",
+		dataType : "xml",
+		url : "/ShowBusXML.Info",
+		contentType : "application/xml",	//요청하는 파일 형식
 		success : function(result){
-			//console.log(result);
-			//alert(bodylist.length);
-			bodylist=result["response"]["body"]["items"]["item"];
-			
-			
-			for(i=0;i<bodylist.length;i++){
-				$('#tstart').append("<option value="+bodylist[i].terminalId+">"+bodylist[i].terminalNm+"</option>");
-				$('#tend').append("<option value="+bodylist[i].terminalId+">"+bodylist[i].terminalNm+"</option>");
+			//alert(result);
+			$(result).find('item').each(function(){
+				var terminalId=$(this).find("terminalId").text();
+				var terminalNm=$(this).find("terminalNm").text();
+				$('#tstart').append("<option value="+terminalId+">"+terminalNm+"</option>");
+				$('#tend').append("<option value="+terminalId+">"+terminalNm+"</option>");
 				
-			}
-				
+			})				
 		},
 		error : function(request,status,error){
 			alert("에러발생");
